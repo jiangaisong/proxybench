@@ -12,187 +12,156 @@
   "proxies": [
     {
       "addr":"47.90.37.13:443",
-      "kcpaddr":"47.90.37.13:10000",
       "provider": "Aliyun",
       "dataCenter": "Hong Kong"
     },
     {
       "addr":"128.199.237.26:443",
-      "kcpaddr":"128.199.237.26:10000",
       "provider": "Digital Ocean",
       "dataCenter": "Singapore"
     },
     {
       "addr":"192.241.194.116:443",
-      "kcpaddr":"192.241.194.116:10000",
       "provider": "Digital Ocean",
       "dataCenter": "San Francisco"
     },
     {
       "addr":"45.32.59.75:443",
-      "kcpaddr":"45.32.59.75:10000",
       "provider": "Vultr",
       "dataCenter": "Tokyo"
     },
     {
       "addr":"108.61.217.48:443",
-      "kcpaddr":"108.61.217.48:10000",
       "provider": "Vultr",
       "dataCenter": "Los Angeles"
     },
     {
       "addr":"52.78.111.161:443",
-      "kcpaddr":"52.78.111.161:10000",
       "provider": "Amazon",
       "dataCenter": "Seoul"
     },
     {
       "addr":"54.199.209.216:443",
-      "kcpaddr":"54.199.209.216:10000",
       "provider": "Amazon",
       "dataCenter": "Tokyo"
     },
     {
       "addr":"54.254.135.224:443",
-      "kcpaddr":"54.254.135.224:10000",
       "provider": "Amazon",
       "dataCenter": "Singapore"
     },
     {
       "addr":"54.187.216.157:443",
-      "kcpaddr":"54.187.216.157:10000",
       "provider": "Amazon",
       "dataCenter": "Oregon"
     },
     {
       "addr":"150.95.131.55:443",
-      "kcpaddr":"150.95.131.55:10000",
       "provider": "ConoHa",
       "dataCenter": "Tokyo"
     },
     {
       "addr":"221.139.50.139:443",
-      "kcpaddr":"221.139.50.139:10000",
       "provider": "KDataCenter",
       "dataCenter": "Korea"
     },
     {
       "addr":"103.25.60.30:443",
-      "kcpaddr":"103.25.60.30:10000",
       "provider": "Compevo",
       "dataCenter": "Hong Kong"
     },
     {
       "addr":"124.248.212.114:443",
-      "kcpaddr":"124.248.212.114:10000",
       "provider": "SunnyVision",
       "dataCenter": "Hong Kong"
     },
     {
       "addr":"23.99.106.151:443",
-      "kcpaddr":"23.99.106.151:10000",
       "provider": "Azure",
       "dataCenter": "Hong Kong"
     },
     {
       "addr":"40.74.87.180:443",
-      "kcpaddr":"40.74.87.180:10000",
       "provider": "Azure",
       "dataCenter": "Osaka"
     },
     {
       "addr":"13.78.62.26:443",
-      "kcpaddr":"13.78.62.26:10000",
       "provider": "Azure",
       "dataCenter": "Tokyo"
     },
     {
       "addr":"101.79.4.241:443",
-      "kcpaddr":"101.79.4.241:10000",
       "provider": "XHostFire",
       "dataCenter": "Korea KT"
     },
     {
       "addr":"212.16.196.32:443",
-      "kcpaddr":"212.16.196.32:10000",
       "provider": "XHostFire",
       "dataCenter": "Vladivostok"
     },
     {
       "addr":"60.249.100.231:443",
-      "kcpaddr":"60.249.100.231:10000",
       "provider": "Vcenter",
       "dataCenter": "Taipei"
     },
     {
       "addr":"160.16.57.206:443",
-      "kcpaddr":"160.16.57.206:10000",
       "provider": "Sakura",
       "dataCenter": "Tokyo"
     },
     {
       "addr":"153.126.178.162:443",
-      "kcpaddr":"153.126.178.162:10000",
       "provider": "Sakura",
       "dataCenter": "Hokkaido"
     },
     {
       "addr":"104.199.162.200:443",
-      "kcpaddr":"104.199.162.200:10000",
       "provider": "Google",
       "dataCenter": "Taiwan"
     },
     {
       "addr":"104.198.106.141:443",
-      "kcpaddr":"104.198.106.141:10000",
       "provider": "Google",
       "dataCenter": "Oregon"
     },
     {
       "addr":"103.41.133.87:443",
-      "kcpaddr":"103.41.133.87:10000",
       "provider": "36 Cloud",
       "dataCenter": "Hong Kong"
     },
     {
       "addr":"27.0.232.240:443",
-      "kcpaddr":"27.0.232.240:10000",
       "provider": "OneProvider",
       "dataCenter": "Hong Kong"
     },
     {
       "addr":"103.15.184.232:443",
-      "kcpaddr":"103.15.184.232:10000",
       "provider": "OneProvider",
       "dataCenter": "Tokyo"
     },
     {
       "addr":"169.56.65.227:443",
-      "kcpaddr":"169.56.65.227:10000",
       "provider": "SoftLayer",
       "dataCenter": "Seoul"
     },
     {
       "addr":"119.81.179.236:443",
-      "kcpaddr":"119.81.179.236:10000",
       "provider": "SoftLayer",
       "dataCenter": "Hong Kong"
     },
     {
       "addr":"198.98.108.139:443",
-      "kcpaddr":"198.98.108.139:10000",
       "provider": "BudgetVM",
       "dataCenter": "Los Angeles"
     },
     {
       "addr":"103.217.253.25:443",
-      "kcpaddr":"103.217.253.25:10000",
       "provider": "Gigavest",
       "dataCenter": "Singapore"
     },
     {
       "addr":"209.58.164.249:443",
-      "kcpaddr":"209.58.164.249:10000",
       "provider": "LeaseWeb",
       "dataCenter": "Singapore"
     }

@@ -17,7 +17,6 @@ import (
 	"github.com/getlantern/netx"
 	"github.com/getlantern/ops"
 	"github.com/oxtoacart/bpool"
-	"github.com/xtaci/kcp-go"
 )
 
 var (
@@ -30,7 +29,6 @@ var (
 
 type Proxy struct {
 	Addr       string `json:"addr"`
-	KCPAddr    string `json:"kcpaddr"`
 	Provider   string `json:"provider"`
 	DataCenter string `json:"dataCenter"`
 }
@@ -83,7 +81,7 @@ func Start(opts *Opts, report ReportFN) {
 	ops.Go(func() {
 		for {
 			opts = opts.fetchUpdate()
-			if rand.Float64() < opts.SampleRate {
+			if rand.Float64() <= opts.SampleRate {
 				log.Debugf("Running benchmarks")
 				bench(opts, report)
 			}
@@ -98,38 +96,28 @@ func Start(opts *Opts, report ReportFN) {
 func bench(opts *Opts, report ReportFN) {
 	for _, origin := range opts.URLs {
 		for _, proxy := range opts.Proxies {
-			useKCP := proxy.KCPAddr != "" && rand.Float64() > 0.5
-			request(report, origin, proxy, useKCP)
+			// http.Transport can't talk to HTTPS proxies, so we need an intermediary.
+			l, err := setupLocalProxy(proxy)
+			if err != nil {
+				log.Errorf("Unable to set up local proxy for %v: %v", proxy.Addr, err)
+				continue
+			}
+			doRequest(report, origin, proxy, l.Addr().String())
+			l.Close()
 		}
 	}
+
 }
 
-func request(report ReportFN, origin string, proxy *Proxy, useKCP bool) {
-	// http.Transport can't talk to HTTPS proxies, so we need an intermediary.
-	l, err := setupLocalProxy(proxy, useKCP)
-	if err != nil {
-		log.Errorf("Unable to set up local proxy for %v: %v", proxy.Addr, err)
-		return
-	}
-	proxyAddr := proxy.Addr
-	protocol := "https"
-	if useKCP {
-		proxyAddr = proxy.KCPAddr
-		protocol = "kcps"
-	}
-	doRequest(report, origin, proxy, l.Addr().String(), proxyAddr, protocol)
-	l.Close()
-}
-
-func doRequest(report ReportFN, origin string, proxy *Proxy, addr string, proxyAddr string, protocol string) {
+func doRequest(report ReportFN, origin string, proxy *Proxy, addr string) {
 	op := ops.Begin("proxybench").
 		Set("url", origin).
 		Set("proxy_type", "chained").
-		Set("proxy_protocol", protocol).
+		Set("proxy_protocol", "https").
 		Set("proxy_provider", proxy.Provider).
 		Set("proxy_datacenter", proxy.DataCenter)
 	defer op.End()
-	host, port, _ := net.SplitHostPort(proxyAddr)
+	host, port, _ := net.SplitHostPort(proxy.Addr)
 	op.Set("proxy_host", host).Set("proxy_port", port)
 
 	log.Debug("Making request")
@@ -170,7 +158,7 @@ func doRequest(report ReportFN, origin string, proxy *Proxy, addr string, proxyA
 	report(delta, ops.AsMap(op, true))
 }
 
-func setupLocalProxy(proxy *Proxy, useKCP bool) (net.Listener, error) {
+func setupLocalProxy(proxy *Proxy) (net.Listener, error) {
 	l, err := net.Listen("tcp", "localhost:")
 	if err != nil {
 		return nil, err
@@ -181,30 +169,20 @@ func setupLocalProxy(proxy *Proxy, useKCP bool) (net.Listener, error) {
 			log.Errorf("Unable to accept connection: %v", err)
 			return
 		}
-		go doLocalProxy(in, proxy, useKCP)
+		go doLocalProxy(in, proxy)
 	}()
 	return l, nil
 }
 
-func doLocalProxy(in net.Conn, proxy *Proxy, useKCP bool) {
+func doLocalProxy(in net.Conn, proxy *Proxy) {
 	defer in.Close()
-	var out net.Conn
-	var err error
-	if useKCP {
-		// Right now we're just hardcoding the data and parity shards for the error
-		// correcting codes. See https://github.com/klauspost/reedsolomon#usage for
-		// a discussion of these.
-		out, err = kcp.DialWithOptions(proxy.KCPAddr, nil, 10, 3)
-	} else {
-		out, err = net.Dial("tcp", proxy.Addr)
-	}
+	out, err := tls.Dial("tcp", proxy.Addr, &tls.Config{
+		InsecureSkipVerify: true,
+	})
 	if err != nil {
 		log.Debugf("Unable to dial proxy %v: %v", proxy, err)
 		return
 	}
-	out = tls.Client(out, &tls.Config{
-		InsecureSkipVerify: true,
-	})
 	bufOut := buffers.Get()
 	bufIn := buffers.Get()
 	defer buffers.Put(bufOut)
