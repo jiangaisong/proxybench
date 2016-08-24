@@ -187,7 +187,7 @@ func doLocalProxy(in net.Conn, proxy *Proxy) {
 	bufIn := buffers.Get()
 	defer buffers.Put(bufOut)
 	defer buffers.Put(bufIn)
-	outErr, inErr := netx.BidiCopy(out, in, bufOut, bufIn, 1*time.Minute)
+	outErr, inErr := netx.BidiCopy(out, in, bufOut, bufIn)
 	if outErr != nil {
 		log.Debugf("Error copying to local proxy from %v: %v", proxy, outErr)
 	}
