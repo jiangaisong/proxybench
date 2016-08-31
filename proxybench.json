@@ -76,17 +76,17 @@
       "dataCenter": "Hong Kong"
     },
     {
-      "addr":"23.99.106.151:443",
+      "addr":"52.175.16.246:443",
       "provider": "Azure",
       "dataCenter": "Hong Kong"
     },
     {
-      "addr":"40.74.87.180:443",
+      "addr":"138.91.29.98:443",
       "provider": "Azure",
       "dataCenter": "Osaka"
     },
     {
-      "addr":"13.78.62.26:443",
+      "addr":"13.78.114.23:443",
       "provider": "Azure",
       "dataCenter": "Tokyo"
     },
@@ -124,11 +124,6 @@
       "addr":"104.198.106.141:443",
       "provider": "Google",
       "dataCenter": "Oregon"
-    },
-    {
-      "addr":"103.41.133.87:443",
-      "provider": "36 Cloud",
-      "dataCenter": "Hong Kong"
     },
     {
       "addr":"27.0.232.240:443",
