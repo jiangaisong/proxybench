@@ -13,6 +13,13 @@ import (
 )
 
 func TestRoundTrip(t *testing.T) {
+	// Force https for testing
+	origProtocols := protocols
+	protocols = []string{"https"}
+	defer func() {
+		protocols = origProtocols
+	}()
+
 	rp := &httputil.ReverseProxy{
 		Director: func(req *http.Request) {
 		},
