@@ -243,6 +243,15 @@
       },
       "provider": "Gigavest",
       "dataCenter": "Singapore"
+    },
+    {
+      "addr": "203.90.226.249:443",
+      "addrs": {
+        "https": "203.90.226.249:443",
+        "obfs4": "203.90.226.249:24443"
+      },
+      "provider": "uDomain",
+      "dataCenter": "Hong Kong"
     }
   ]
 }
