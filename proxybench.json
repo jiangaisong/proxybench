@@ -252,6 +252,24 @@
       },
       "provider": "uDomain",
       "dataCenter": "Hong Kong"
+    },
+    {
+      "addr": "103.15.120.133:443",
+      "addrs": {
+        "https": "103.15.120.133:443",
+        "obfs4": "103.15.120.133:24443"
+      },
+      "provider": "BizMac",
+      "dataCenter": "Hong Kong"
+    },
+    {
+      "addr": "45.117.76.21:443",
+      "addrs": {
+        "https": "45.117.76.21:443",
+        "obfs4": "45.117.76.21:24443"
+      },
+      "provider": "BizMac",
+      "dataCenter": "Vietnam"
     }
   ]
 }
