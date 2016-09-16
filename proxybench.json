@@ -254,6 +254,15 @@
       "dataCenter": "Hong Kong"
     },
     {
+      "addr": "203.135.142.243:443",
+      "addrs": {
+        "https": "203.135.142.243:443",
+        "obfs4": "203.135.142.243:24443"
+      },
+      "provider": "uDomain",
+      "dataCenter": "Hong Kong CN2"
+    },
+    {
       "addr": "103.15.120.133:443",
       "addrs": {
         "https": "103.15.120.133:443",
