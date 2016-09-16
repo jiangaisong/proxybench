@@ -5,6 +5,7 @@ package proxybench
 import (
 	"crypto/tls"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"math/rand"
@@ -17,20 +18,33 @@ import (
 	"github.com/getlantern/netx"
 	"github.com/getlantern/ops"
 	"github.com/oxtoacart/bpool"
+
+	"git.torproject.org/pluggable-transports/goptlib.git"
+	"git.torproject.org/pluggable-transports/obfs4.git/transports/obfs4"
 )
 
 var (
-	log = golog.LoggerFor("proxybench")
-
-	buffers = bpool.NewBytePool(10, 65536)
-
+	log          = golog.LoggerFor("proxybench")
+	buffers      = bpool.NewBytePool(10, 65536)
+	protocols    = []string{"https", "obfs4"}
 	testingProxy = ""
 )
 
 type Proxy struct {
-	Addr       string `json:"addr"`
-	Provider   string `json:"provider"`
-	DataCenter string `json:"dataCenter"`
+	Addrs      map[string]string `json:"addrs"`
+	Provider   string            `json:"provider"`
+	DataCenter string            `json:"dataCenter"`
+}
+
+func (p *Proxy) withRandomProtocol() *proxy {
+	protocol := protocols[rand.Intn(len(protocols))]
+	return &proxy{p, protocol, p.Addrs[protocol]}
+}
+
+type proxy struct {
+	*Proxy
+	protocol string
+	addr     string
 }
 
 type Opts struct {
@@ -69,7 +83,7 @@ func (opts *Opts) applyDefaults() {
 		log.Debug("Overriding urls and proxy in testing mode")
 		opts.SampleRate = 1
 		opts.URLs = []string{"http://i.ytimg.com/vi/video_id/0.jpg"}
-		opts.Proxies = []*Proxy{&Proxy{Addr: testingProxy, Provider: "testingProvider", DataCenter: "testingDC"}}
+		opts.Proxies = []*Proxy{&Proxy{Addrs: map[string]string{"https": testingProxy}, Provider: "testingProvider", DataCenter: "testingDC"}}
 	}
 }
 
@@ -81,7 +95,7 @@ func Start(opts *Opts, report ReportFN) {
 	ops.Go(func() {
 		for {
 			opts = opts.fetchUpdate()
-			if rand.Float64() <= opts.SampleRate {
+			if rand.Float64() < opts.SampleRate {
 				log.Debugf("Running benchmarks")
 				bench(opts, report)
 			}
@@ -96,28 +110,31 @@ func Start(opts *Opts, report ReportFN) {
 func bench(opts *Opts, report ReportFN) {
 	for _, origin := range opts.URLs {
 		for _, proxy := range opts.Proxies {
-			// http.Transport can't talk to HTTPS proxies, so we need an intermediary.
-			l, err := setupLocalProxy(proxy)
-			if err != nil {
-				log.Errorf("Unable to set up local proxy for %v: %v", proxy.Addr, err)
-				continue
-			}
-			doRequest(report, origin, proxy, l.Addr().String())
-			l.Close()
+			request(report, origin, proxy.withRandomProtocol())
 		}
 	}
-
 }
 
-func doRequest(report ReportFN, origin string, proxy *Proxy, addr string) {
+func request(report ReportFN, origin string, proxy *proxy) {
+	// http.Transport can't talk to HTTPS proxies, so we need an intermediary.
+	l, err := setupLocalProxy(proxy)
+	if err != nil {
+		log.Errorf("Unable to set up local proxy for %v: %v", proxy.addr, err)
+		return
+	}
+	doRequest(report, origin, proxy, l.Addr().String())
+	l.Close()
+}
+
+func doRequest(report ReportFN, origin string, proxy *proxy, addr string) {
 	op := ops.Begin("proxybench").
 		Set("url", origin).
 		Set("proxy_type", "chained").
-		Set("proxy_protocol", "https").
+		Set("proxy_protocol", proxy.protocol).
 		Set("proxy_provider", proxy.Provider).
 		Set("proxy_datacenter", proxy.DataCenter)
 	defer op.End()
-	host, port, _ := net.SplitHostPort(proxy.Addr)
+	host, port, _ := net.SplitHostPort(proxy.addr)
 	op.Set("proxy_host", host).Set("proxy_port", port)
 
 	log.Debug("Making request")
@@ -158,7 +175,7 @@ func doRequest(report ReportFN, origin string, proxy *Proxy, addr string) {
 	report(delta, ops.AsMap(op, true))
 }
 
-func setupLocalProxy(proxy *Proxy) (net.Listener, error) {
+func setupLocalProxy(proxy *proxy) (net.Listener, error) {
 	l, err := net.Listen("tcp", "localhost:")
 	if err != nil {
 		return nil, err
@@ -174,11 +191,9 @@ func setupLocalProxy(proxy *Proxy) (net.Listener, error) {
 	return l, nil
 }
 
-func doLocalProxy(in net.Conn, proxy *Proxy) {
+func doLocalProxy(in net.Conn, proxy *proxy) {
 	defer in.Close()
-	out, err := tls.Dial("tcp", proxy.Addr, &tls.Config{
-		InsecureSkipVerify: true,
-	})
+	out, err := proxy.dial()
 	if err != nil {
 		log.Debugf("Unable to dial proxy %v: %v", proxy, err)
 		return
@@ -194,6 +209,46 @@ func doLocalProxy(in net.Conn, proxy *Proxy) {
 	if inErr != nil {
 		log.Debugf("Error copying from local proxy to %v: %v", proxy, inErr)
 	}
+}
+
+func (p *proxy) dial() (net.Conn, error) {
+	switch p.protocol {
+	case "https":
+		return p.dialTLS()
+	case "obfs4":
+		return p.dialOBFS4()
+	default:
+		return nil, fmt.Errorf("Unknown protocol %v", p.protocol)
+	}
+}
+
+func (p *proxy) dialTLS() (net.Conn, error) {
+	conn, err := netx.Dial("tcp", p.addr)
+	if err != nil {
+		return nil, err
+	}
+	tlsConn := tls.Client(conn, &tls.Config{
+		InsecureSkipVerify: true,
+	})
+	return tlsConn, nil
+}
+
+func (p *proxy) dialOBFS4() (net.Conn, error) {
+	tr := obfs4.Transport{}
+	cf, err := tr.ClientFactory("")
+	if err != nil {
+		return nil, log.Errorf("Unable to create obfs4 client factory: %v", err)
+	}
+
+	ptArgs := &pt.Args{}
+	ptArgs.Add("cert", "1LYfzzTyz7xsu0bTBUJacwDTLN3NU/gNSjC+pfdRVNuh/LYmtbLOlhZwCfNTKyUVvfMTWQ")
+	ptArgs.Add("iat-mode", "0")
+
+	args, err := cf.ParseArgs(ptArgs)
+	if err != nil {
+		return nil, log.Errorf("Unable to parse client args: %v", err)
+	}
+	return cf.Dial("tcp", p.addr, netx.Dial, args)
 }
 
 func (opts *Opts) fetchUpdate() *Opts {
