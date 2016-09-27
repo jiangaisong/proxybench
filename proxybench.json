@@ -38,6 +38,15 @@
       "dataCenter": "San Francisco"
     },
     {
+      "addr": "162.243.187.17:443",
+      "addrs": {
+        "https": "162.243.187.17:443",
+        "obfs4": "162.243.187.17:24443"
+      },
+      "provider": "Digital Ocean",
+      "dataCenter": "New York"
+    },
+    {
       "addr": "106.186.125.97:443",
       "addrs": {
         "https": "106.186.125.97:443",
