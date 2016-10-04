@@ -75,8 +75,8 @@ func (opts *Opts) applyDefaults() {
 			"https://www.google.com/humans.txt",
 			"https://www.facebook.com/humans.txt",
 			"https://67.media.tumblr.com/avatar_4adfafc4c768_48.png",
-			"http://i.ytimg.com/vi/video_id/0.jpg", // YouTube
-			"http://149.154.167.91/",               // Telegram Instant Messenger
+			"http://s.ytimg.com/yts/cssbin/www-pageframe-webp-vfl37g48Z.css", // YouTube
+			"http://149.154.167.91/",                                         // Telegram Instant Messenger
 		}
 	}
 	if testingMode {
