@@ -128,51 +128,6 @@
       "dataCenter": "Hong Kong"
     },
     {
-      "addr": "52.175.16.246:443",
-      "addrs": {
-        "https": "52.175.16.246:443",
-        "obfs4": "52.175.16.246:24443"
-      },
-      "provider": "Azure",
-      "dataCenter": "Hong Kong"
-    },
-    {
-      "addr": "138.91.29.98:443",
-      "addrs": {
-        "https": "138.91.29.98:443",
-        "obfs4": "138.91.29.98:24443"
-      },
-      "provider": "Azure",
-      "dataCenter": "Osaka"
-    },
-    {
-      "addr": "13.78.114.23:443",
-      "addrs": {
-        "https": "13.78.114.23:443",
-        "obfs4": "13.78.114.23:24443"
-      },
-      "provider": "Azure",
-      "dataCenter": "Tokyo"
-    },
-    {
-      "addr": "101.79.4.241:443",
-      "addrs": {
-        "https": "101.79.4.241:443",
-        "obfs4": "101.79.4.241:24443"
-      },
-      "provider": "XHostFire",
-      "dataCenter": "Korea KT"
-    },
-    {
-      "addr": "212.16.196.32:443",
-      "addrs": {
-        "https": "212.16.196.32:443",
-        "obfs4": "212.16.196.32:24443"
-      },
-      "provider": "XHostFire",
-      "dataCenter": "Vladivostok"
-    },
-    {
       "addr": "27.0.232.240:443",
       "addrs": {
         "https": "27.0.232.240:443",
